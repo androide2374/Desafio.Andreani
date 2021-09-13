@@ -1,0 +1,3 @@
+FROM mcr.microsoft.com/mssql/server:2017-CU18-ubuntu-16.04
+COPY ./GEODBCreator.sql .
+CMD sqlcmd -i GEODBCreator.sql

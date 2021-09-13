@@ -1,0 +1,47 @@
+--- 
+version: "3.7"
+
+services:  
+  db_mssql:
+    image: mcr.microsoft.com/mssql/server:2017-CU18-ubuntu-16.04
+    environment:
+      SA_PASSWORD: "Pass@word"
+      ACCEPT_EULA: "Y"
+    volumes:
+      - "mssql_data:/var/opt/mssql"
+    ports:
+      - "1433:1433"
+    deploy:
+      mode: replicated
+      replicas: 1
+    restart: always
+
+  rabbitmq:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    container_name: rabbitmq
+    restart: always
+    ports:
+      - 9890:15672
+      - 8888:5672
+    hostname: stats
+    volumes:
+      - ./data:/var/lib/rabbitmq/mnesia
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: 1234
+      RABBITMQ_VM_MEMORY_HIGH_WATERMARK: 0.5
+    networks:
+      rabbitmq_net:
+        aliases:
+          - rabbitmq_host
+    
+volumes:
+  mssql_data:
+  data: {}
+networks:
+  rabbitmq_net:
+    name: rabbitmq_network
+    driver: bridge
+
